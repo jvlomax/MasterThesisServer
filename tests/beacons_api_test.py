@@ -2,7 +2,8 @@ from flask.ext.testing import TestCase
 import unittest
 from server import app, db
 from config import TestConfig
-import requests
+
+
 class BeaconTestCase(TestCase):
     SQLALCHEMY_DATABASE_URI = "sqlite://"
     TESTING = True
