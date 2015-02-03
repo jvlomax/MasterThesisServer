@@ -1,3 +1,4 @@
 flask
 flask-testing
 flask-sqlalchemy
+flask-restful
