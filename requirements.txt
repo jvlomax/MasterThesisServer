@@ -1,4 +1,3 @@
-sqlalchemy
 flask
 flask-testing
 flask-sqlalchemy
