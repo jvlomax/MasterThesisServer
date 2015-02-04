@@ -11,6 +11,7 @@ class DevConfig(MasterConfig):
 class TestConfig(MasterConfig):
     DEBUG = False
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///testing.db'
 
 
 class ProductionConfig(MasterConfig):
