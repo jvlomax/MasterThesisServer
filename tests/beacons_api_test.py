@@ -33,5 +33,12 @@ class BeaconTestCase(TestCase):
         print(rv.data)
         self.assertNotEqual(rv.status_code, 500)
 
+    def test_update(self):
+        rv = self.client.put("/beacon", data={"mac_address": "11-11-11-11",
+                                       "location": "test location",
+                                       "guardian": 1})
+        print(rv.data)
+
+
 if __name__ == "__main__":
     unittest.main()

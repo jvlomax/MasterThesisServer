@@ -28,11 +28,27 @@ class Beacons_view(restful.Resource):
                         "message": "beacon created",
                         "new_beacon_id": beacon.id})
 
+    def put(self):
+        args = parser.parse_args()
+        mac_address = args.get("mac_address")
+        location = args.get("location")
+
+        try:
+            beacon = Beacon(mac_address, location)
+            db.session.add(beacon)
+            db.session.commit()
+        except exc.SQLAlchemyError as e:
+            raise DatabaseError
+        return jsonify({"status": "200",
+                        "message": "beacon created",
+                        "new_beacon_id": beacon.id})
+
 
     def remove_beacon(self, id):
         b = Beacon.query.get(id)
         db.session.delete(b)
         db.session.commit()
+
 
     def get(self, id):
         try:
