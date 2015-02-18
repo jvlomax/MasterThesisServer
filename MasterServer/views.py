@@ -1,9 +1,9 @@
 from flask import jsonify, render_template
 from MasterServer.utils.exceptions import DatabaseError
+from MasterServer.models.devices import Devices
+from MasterServer import app,db
 
-from MasterServer import app
-
-
+import uuid
 
 
 
@@ -23,6 +23,15 @@ def register_api(view, endpoint, url, pk="id", pk_type="int"):
 register_api(Beacons_view, "beacons_view", "/beacons/", pk="id", pk_type="path")
 
 
+
+@app.route("/register/<path:mac_address>")
+def register_device(mac_address):
+    device = Devices(mac_address)
+
+    db.session.add(device)
+    db.session.commit()
+
+    return jsonify({"status": 200, "message": "Deveice sucessfully register", "uuid": device.id})
 
 @app.route('/')
 def hello_world():

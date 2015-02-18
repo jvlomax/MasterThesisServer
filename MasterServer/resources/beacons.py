@@ -5,7 +5,7 @@ from sqlalchemy import exc
 from MasterServer.models.models import Beacon
 from MasterServer import db
 from MasterServer.utils.exceptions import DatabaseError
-
+import json
 parser = reqparse.RequestParser()
 parser.add_argument("guardian_id", type=int, help="The id of a guardian")
 parser.add_argument("location", type=str, help="Human readable location of the beacon", location=["values", "json", "args", "data"])
@@ -14,7 +14,7 @@ parser.add_argument("team", type=int, help="The team controlling the beacon")
 
 #TODO: write new parser or figure another way. "secret" is supposed to be a required argument
 delete_parser = parser.copy()
-delete_parser.add_argument("secret", type=str, help="Secret", location={"data", "values", "json"})
+delete_parser.add_argument("device_id", type=int, help="device_id", location={"data", "values", "json"})
 
 class Beacons_view(MethodView):
     def get(self, id):
@@ -24,8 +24,9 @@ class Beacons_view(MethodView):
                 all = Beacon.query.all()
                 l = []
                 for item in all:
-                    l.append(item)
-                return jsonify(l)
+                    l.append([item.as_dict()])
+
+                return json.dumps(l)
             b = Beacon.query.get(id)
             if not b:
                 return jsonify({"status": "404", "message": "Not found"}), 404
@@ -42,7 +43,7 @@ class Beacons_view(MethodView):
         args = parser.parse_args()
         mac_address = args.get("mac_address")
         location = args.get("location")
-        print(args)
+
         try:
             beacon = Beacon(mac_address, location)
             db.session.add(beacon)
@@ -68,17 +69,7 @@ class Beacons_view(MethodView):
 
     def delete(self, id):
 
-
-        #args = delete_parser.parse_args()
-
-        #print(args)
-        #if args.get("secret") != "secret":
-        #   print("secret not found")
-         #   return jsonify({"status": 500, "message": "You don't know the secret"})
-
         b = Beacon.query.get(id)
-
-
         db.session.delete(b)
         db.session.commit()
         return jsonify({"status": 200, "message": "Beacon {} deleted".format(id)})
