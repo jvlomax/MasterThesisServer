@@ -25,7 +25,8 @@ class BeaconTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        os.unlink("test.db")
+        if "test.db" in os.listdir():
+            os.unlink("test.db")
 
     def test_empty_db(self):
         rv = self.client.get("/beacons/{}".format(self.DEFAULT_ID))

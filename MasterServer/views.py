@@ -3,14 +3,7 @@ from MasterServer.utils.exceptions import DatabaseError
 from MasterServer.models.devices import Devices
 from MasterServer import app,db
 
-import uuid
-
-
-
-
 from MasterServer.resources.beacons import Beacons_view
-
-
 
 
 def register_api(view, endpoint, url, pk="id", pk_type="int"):
@@ -43,7 +36,3 @@ def handle_database_error(error):
     response.status_code = error.status_code
     return response
 
-#if __name__ == '__main__':
-
-  #  print(app.url_map)
-  #  app.run(debug=True)
