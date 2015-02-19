@@ -2,22 +2,26 @@ import unittest
 import os
 import json
 from flask.ext.testing import TestCase
-
+import requests
 from MasterServer import app, db
 from MasterServer.config import TestConfig
 
 
 class BeaconTestCase(TestCase):
-    DEFAULT_ID = "00-00-00-00"
+    DEFAULT_ID = "00-00-00-00-00-00"
     DEFAULT_LOCATION = "test location"
     DEFAULT_GUARDIAN = None
     MANY = 10
+
     def create_app(self):
         app.config.from_object(TestConfig)
+        self.server_token = None
         return app
 
     def setUp(self):
         db.create_all()
+        rv = self.client.get("/register/{}".format(self.DEFAULT_ID))
+        self.server_token = rv.json.get("uuid")
 
     def tearDown(self):
         db.session.remove()
@@ -85,7 +89,8 @@ class BeaconTestCase(TestCase):
         self.test_craete_new()
         rv = self.client.get("/beacons/{}".format(self.DEFAULT_ID))
         self.assert200(rv)
-        rv = self.client.delete("/beacons/{}".format(self.DEFAULT_ID), data={"secret": "secret"})
+
+        rv = self.client.delete("/beacons/{}".format(self.DEFAULT_ID))
         self.assert200(rv)
         rv = self.client.get("/beacons/{}".format(self.DEFAULT_ID))
         self.assert404(rv)
@@ -97,5 +102,14 @@ class BeaconTestCase(TestCase):
                                        "location": self.DEFAULT_LOCATION,
                                        "guardian": self.DEFAULT_LOCATION})
         self.assert500(rv)
+        rv = self.client.post("/beacons/", data={"mac_address": "00-54-54-54-54",
+                                       "location": self.DEFAULT_LOCATION,
+                                       "guardian": self.DEFAULT_LOCATION})
+        self.assert500(rv)
+
+    def test_delete_nothing(self):
+        pass
+
+
 if __name__ == "__main__":
     unittest.main()
