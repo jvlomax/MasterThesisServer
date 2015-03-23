@@ -15,7 +15,7 @@ def register_api(view, endpoint, url, pk="id", pk_type="int"):
 
 
 register_api(BeaconsView, "beacons_view", "/beacons/", pk="id", pk_type="path")
-register_api(GuardiansView, "guardians_view", "/guardians", pk="id", pk_type="int")
+register_api(GuardiansView, "guardians_view", "/guardians/", pk="id", pk_type="int")
 
 
 @app.route("/register/<path:mac_address>")

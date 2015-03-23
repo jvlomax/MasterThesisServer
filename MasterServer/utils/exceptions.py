@@ -1,4 +1,9 @@
 class DatabaseError(Exception):
+    """Excetion for all general database erros
+    
+    .. note::
+        Something something
+    """
     status_code = 500
     def __init__(self, message="", payload=None):
         super().__init__()

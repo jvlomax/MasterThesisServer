@@ -1,11 +1,18 @@
-from flask.views import MethodView
+from MasterServer.resources.baseView import BaseView
 from MasterServer.models.guardian import Guardian
+from MasterServer.utils.exceptions import DatabaseError
 import json
+from MasterServer import db
+from sqlalchemy import exc
 
-
-class GuardiansView(MethodView):
+class GuardiansView(BaseView):
 
     def get(self, id):
+        """
+
+        :param id:
+        :return:
+        """
         if not id:
             guardians = Guardian.query.all()
             li = []
@@ -18,13 +25,46 @@ class GuardiansView(MethodView):
             return json.dumps(guardian.as_dict())
 
     def post(self):
-        pass
+        args = self.parse_args()
+        guardian = Guardian(args.get("name"), args.get("stats"), args.get("team"), args.get("owner"))
+
+        try:
+            db.session.add(guardian)
+            db.session.commit()
+        except Exception:
+            raise DatabaseError(message="Could not create guardian")
+
+        return self.make_response("Guardian successfully created with id {}".format(guardian.id), "201", 201)
+
 
     def put(self, id):
-        pass
+        args = self.parse_args()
+        try:
+            guardian = Guardian.get(id)
+        except exc.SQLAlchemyError as e:
+            raise DatabaseError(message=e)
+
+        guardian.name = args.get("name")
+        guardian.team = args.get("team")
+        guardian.stats = args.get("stats")
+        guardian.owner_id = args.get("owner")
+
+        try:
+            db.session.add(guardian)
+            db.session.commit()
+        except exc.SQLAlchemyError as e:
+            raise DatabaseError(message=e)
+
+        self.make_response("Successfully updated info", "success", 200)
+
 
     def delete(self, id):
-        pass
+        try:
+            guardian = Guardian.get(id)
+        except exc.SQLAlchemyError as e:
+            raise DatabaseError(message=e)
 
-    def parse_args(self):
-        pass
+
+        db.session.delete(guardian)
+        db.session.commit()
+        self.make_response("Successfully deleted guardian {}", "Success", 200)
